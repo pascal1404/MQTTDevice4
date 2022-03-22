@@ -36,16 +36,31 @@ public:
         }
         if (millis() > powerLast + (dutycycle_actor * power_actor / 100L))
         {
-          digitalWrite(pin_actor, OFF);
+          if(isPortExpanderPin(pin_actor)){
+            pcf8575.digitalWrite(pin_actor - 20, OFF);
+          }
+          else{
+            digitalWrite(pin_actor, OFF);
+          }
         }
         else
         {
-          digitalWrite(pin_actor, ON);
+          if(isPortExpanderPin(pin_actor)){
+            pcf8575.digitalWrite(pin_actor - 20, ON);
+          }
+          else{
+            digitalWrite(pin_actor, ON);
+          }
         }
       }
       else
       {
-        digitalWrite(pin_actor, OFF);
+        if(isPortExpanderPin(pin_actor)){
+          pcf8575.digitalWrite(pin_actor - 20, OFF);
+        }
+        else{
+          digitalWrite(pin_actor, OFF);
+        }
       }
     }
   }
@@ -55,7 +70,12 @@ public:
     // Set PIN
     if (isPin(pin_actor))
     {
-      digitalWrite(pin_actor, HIGH);
+      if(isPortExpanderPin(pin_actor)){
+        pcf8575.digitalWrite(pin_actor - 20, HIGH);
+      }
+      else{
+        digitalWrite(pin_actor, HIGH);
+      }
       pins_used[pin_actor] = false;
       millis2wait(10);
     }
@@ -63,8 +83,14 @@ public:
     pin_actor = StringToPin(pin);
     if (isPin(pin_actor))
     {
-      pinMode(pin_actor, OUTPUT);
-      digitalWrite(pin_actor, HIGH);
+      if(isPortExpanderPin(pin_actor)){
+        pcf8575.pinMode(pin_actor - 20, OUTPUT);
+        pcf8575.digitalWrite(pin_actor - 20, HIGH);
+      }
+      else{
+        pinMode(pin_actor, OUTPUT);
+        digitalWrite(pin_actor, HIGH);
+      }
       pins_used[pin_actor] = true;
     }
 
@@ -164,8 +190,24 @@ public:
   }
 };
 
-// Initialisierung des Arrays max 8
+// Initialisierung des Arrays max 24
 Actor actors[numberOfActorsMax] = {
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
+    Actor("", "", "", false, false),
     Actor("", "", "", false, false),
     Actor("", "", "", false, false),
     Actor("", "", "", false, false),
@@ -300,15 +342,32 @@ void handlereqPins()
     message += PinToString(actors[id].pin_actor);
     message += F("</option><option disabled>──────────</option>");
   }
-  for (int i = 0; i < numberOfPins; i++)
+  if (usePortExpander)
   {
-    if (pins_used[pins[i]] == false)
+    for (int i = 0; i < numberOfPins; i++)
     {
-      message += F("<option>");
-      message += pin_names[i];
-      message += F("</option>");
+      if (pins_used[pins[i]] == false)
+      {
+        message += F("<option>");
+        message += pin_names[i];
+        message += F("</option>");
+      }
+      yield();
     }
-    yield();
+  }
+  else
+  {
+    for (int i = 0; i < numberOfPinsWithoutPortExp; i++)
+    {
+      if (pins_used[pins[i]] == false)
+      {
+        message += F("<option>");
+        message += pin_names[i];
+        message += F("</option>");
+      }
+      yield();
+    }
+    
   }
   server.send(200, "text/plain", message);
 }
@@ -349,5 +408,15 @@ bool isPin(unsigned char pinbyte)
     }
   }
 Ende:
+  return returnValue;
+}
+
+bool isPortExpanderPin(unsigned char pinbyte)
+{
+  bool returnValue = false;
+  if (pinbyte >= 20)
+  {
+    returnValue = true;
+  }
   return returnValue;
 }

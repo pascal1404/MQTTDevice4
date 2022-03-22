@@ -87,6 +87,21 @@ void setup()
     nextion.update();
   }
 
+  if (usePortExpander)
+  {
+    // Setup the Interrupt for PCF8575
+    //pinMode(ESP8266_INTERRUPTED_PIN, INPUT_PULLUP);
+    //attachInterrupt(digitalPinToInterrupt(ESP8266_INTERRUPTED_PIN), pcfInterruptOnPCF8575, FALLING);
+    
+    // Setup the ALL ports as Input on PCF8575
+    for(int i=0;i<16;i++) {
+    pcf8575.pinMode(i, INPUT);
+    }
+        
+    // Initialize the PCF8575
+    pcf8575.begin();
+  }
+
   if (startBuzzer)
   {
     pins_used[PIN_BUZZER] = true;

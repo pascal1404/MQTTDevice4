@@ -92,10 +92,14 @@ int CMD[6][33] = {
     {1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0}}; // P5
 unsigned char PWR_STEPS[] = {0, 20, 40, 60, 80, 100};                                                     // Prozentuale Abstufung zwischen den Stufen
 
-bool pins_used[17];
-const unsigned char numberOfPins = 9;
-const unsigned char pins[numberOfPins] = {D0, D1, D2, D3, D4, D5, D6, D7, D8};
-const String pin_names[numberOfPins] = {"D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8"};
+bool pins_used[35];
+//const unsigned char numberOfPins = 9;
+//const unsigned char pins[numberOfPins] = {D0, D1, D2, D3, D4, D5, D6, D7, D8};
+//const String pin_names[numberOfPins] = {"D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8"};
+const unsigned char numberOfPins = 25;
+const unsigned char numberOfPinsWithoutPortExp = 9;
+const unsigned char pins[numberOfPins] = {D0, D1, D2, D3, D4, D5, D6, D7, D8, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35};
+const String pin_names[numberOfPins] = {"D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "P00", "P01", "P02", "P03", "P04", "P05", "P06", "P07", "P10", "P11", "P12", "P13", "P14", "P15", "P16", "P17"};
 
 // Variablen
 unsigned char numberOfSensors = 0; // Gesamtzahl der Sensoren
@@ -103,7 +107,7 @@ unsigned char numberOfSensors = 0; // Gesamtzahl der Sensoren
 unsigned char addressesFound[numberOfSensorsMax][8];
 unsigned char numberOfSensorsFound = 0;
 unsigned char numberOfActors = 0; // Gesamtzahl der Aktoren
-#define numberOfActorsMax 8       // Maximale Anzahl an Aktoren
+#define numberOfActorsMax 24       // Maximale Anzahl an Aktoren
 #define maxHostSign 16
 #define maxUserSign 10
 #define maxPassSign 10
@@ -299,6 +303,24 @@ NextionComponent p2uhrzeit_text(nextion, 2, 7);
 NextionComponent p2slider(nextion, 2, 1);
 NextionComponent p2temp_text(nextion, 2, 5);
 NextionComponent p2gauge(nextion, 2, 4);
+
+
+// Portexpander i2c
+#include "PCF8575.h"  // https://www.mischianti.org/2020/03/13/pcf8574-i2c-digital-i-o-expander-rotary-encoder-part-2/
+#define INTERRUPTED_PIN D3
+
+// Function Interrupt Flag from PCF8575 bool pcfInt = false;
+
+/*ICACHE_RAM_ATTR void pcfInterruptOnPCF8575(){ // Interrupt function >= V2.5.2 !!!
+pcfInt = true;
+}*/
+
+// Set i2c address
+bool usePortExpander = true;
+//PCF8574 pcf8574(0x20, INTERRUPTED_PIN, EncoderISR);
+PCF8575 pcf8575(0x20);
+
+
 
 #define ALARM_ON 1
 #define ALARM_OFF 2

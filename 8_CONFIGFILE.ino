@@ -99,6 +99,8 @@ bool loadConfig()
 
   startBuzzer = miscObj["buzzer"] | 0;
   DEBUG_MSG("Buzzer: %d\n", startBuzzer);
+  usePortExpander = miscObj["portexpander"] | 0;
+  DEBUG_MSG("Portexpander: %d\n", usePortExpander);
   useDisplay = miscObj["display"] | 0;
   startPage = miscObj["page"] | 1;
   DEBUG_MSG("Display: %d startPage: %d\n", useDisplay, startPage);
@@ -222,6 +224,7 @@ bool saveConfig()
   DEBUG_MSG("Switch off actors on error enabled after %d sec\n", (wait_on_error_mqtt / 1000));
 
   miscObj["buzzer"] = (int)startBuzzer;
+  miscObj["portexpander"] = (int)usePortExpander;
   miscObj["display"] = (int)useDisplay;
   miscObj["page"] = startPage;
   miscObj["devbranch"] = (int)devBranch;

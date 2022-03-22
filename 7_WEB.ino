@@ -164,6 +164,7 @@ void handleRequestMisc2()
   doc["enable_mqtt"] = StopOnMQTTError;
   doc["mqtt_state"] = mqtt_state; // Anzeige MQTT Status -> mqtt_state verzögerter Status!
   doc["buzzer"] = startBuzzer;
+  doc["portexpander"] = usePortExpander;
   doc["display"] = useDisplay;
   doc["alertstate"] = alertState;
   if (alertState)
@@ -183,6 +184,7 @@ void handleRequestMisc()
   doc["mdns_name"] = nameMDNS;
   doc["mdns"] = startMDNS;
   doc["buzzer"] = startBuzzer;
+  doc["portexpander"] = usePortExpander;
   doc["display"] = useDisplay;
   doc["page"] = startPage;
   doc["devbranch"] = devBranch;
@@ -268,6 +270,10 @@ void handleSetMisc()
     if (server.argName(i) == "buzzer")
     {
       startBuzzer = checkBool(server.arg(i));
+    }
+    if (server.argName(i) == "portexpander")
+    {
+      usePortExpander = checkBool(server.arg(i));
     }
     if (server.argName(i) == "display")
     {
