@@ -101,6 +101,7 @@ void listenerSystem(int event, int parm) // System event listener
     {
       if (pubsubClient.connected())
       {
+        pubsubClient.setBufferSize(512);
         mqtt_state = true;
         pubsubClient.loop();
         if (TickerMQTT.state() == RUNNING)

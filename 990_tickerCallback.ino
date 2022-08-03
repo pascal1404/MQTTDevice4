@@ -1,7 +1,7 @@
 void brewCallback()
 {
   activePage = 0;
-  nextion.command("page 0");
+  //nextion.command("page 0");
   // DEBUG_MSG("Ticker: brewCallback activePage: %d\n", activePage);
   BrewPage();
   TickerDisp.updatenow();
@@ -9,7 +9,7 @@ void brewCallback()
 void kettleCallback()
 {
   activePage = 1;
-  nextion.command("page 1");
+  //nextion.command("page 1");
   // DEBUG_MSG("Ticker: kettleCallback activePage: %d\n", activePage);
   KettlePage();
   TickerDisp.updatenow();
@@ -17,7 +17,7 @@ void kettleCallback()
 void inductionCallback()
 {
   activePage = 2;
-  nextion.command("page 2");
+  //nextion.command("page 2");
   // DEBUG_MSG("Ticker: inductionCallback activePage: %d\n", activePage);
   InductionPage();
   TickerDisp.updatenow();
@@ -59,11 +59,11 @@ void tickerDispCallback()
     InductionPage();
     break;
   default:
-    nextion.command("page 1");
+    //nextion.command("page 1");
     KettlePage();
     break;
   }
-  nextion.update();
+ // nextion.update();
 }
 
 void tickerSenCallback() // Timer Objekt Sensoren

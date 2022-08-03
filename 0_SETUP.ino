@@ -12,6 +12,8 @@ void setup()
   snprintf(mqtt_clientid, maxHostSign, "ESP8266-%08X", ESP.getChipId());
   Serial.printf("*** SYSINFO: start up MQTTDevice - device ID: %s\n", mqtt_clientid);
 
+  tft.initR(INITR_BLACKTAB);      // Init ST7735S chip, black tab
+
   wifiManager.setDebugOutput(false);
   wifiManager.setMinimumSignalQuality(10);
   wifiManager.setConfigPortalTimeout(300);
@@ -78,14 +80,24 @@ void setup()
 
   if (useDisplay)
   {
-    nextion.begin(softSerial);
+//    nextion.begin(softSerial);
     // nextion.debug(Serial);
-    pins_used[D1] = true;
-    pins_used[D2] = true;
+    //pins_used[D1] = true;
+    //pins_used[D2] = true;
     TickerDisp.start();
     initDisplay();
-    nextion.update();
-  }
+ //   nextion.update();
+    //##################
+    pins_used[TFT_CS] = true;
+    pins_used[TFT_DC] = true;
+    pins_used[TFT_MOSI] = true;
+    pins_used[TFT_SCLK] = true;
+    tft.setTextWrap(false);
+    //tft.setSPISpeed(80000000);
+    showDispClear();
+    homeScreen("", "", "XX.X", "XX.X", "");
+    showDispIP(String(WiFi.localIP().toString()));
+  } 
 
   if (usePortExpander)
   {
@@ -93,9 +105,14 @@ void setup()
     //pinMode(ESP8266_INTERRUPTED_PIN, INPUT_PULLUP);
     //attachInterrupt(digitalPinToInterrupt(ESP8266_INTERRUPTED_PIN), pcfInterruptOnPCF8575, FALLING);
     
-    // Setup the ALL ports as Input on PCF8575
-    for(int i=0;i<16;i++) {
-    pcf8575.pinMode(i, INPUT);
+    // Setup the ALL ports that are unused as Input on PCF8575
+    for (int i = 0; i < numberOfPins; i++)
+    {
+      if (pins_used[pins[i]] == false)
+      {
+        pcf8575.pinMode(i - 20, INPUT);
+      }
+      yield();
     }
         
     // Initialize the PCF8575

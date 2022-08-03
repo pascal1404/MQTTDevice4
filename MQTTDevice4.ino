@@ -184,7 +184,7 @@ InnuTicker TickerDisp;
 
 // Update Intervalle für Ticker Objekte
 int SEN_UPDATE = 4000; //  sensors update
-int DISP_UPDATE = 1000;
+int DISP_UPDATE = 4000;
 
 // Systemstart
 bool startMDNS = true; // Standard mDNS Name ist ESP8266- mit mqtt_chip_key
@@ -258,7 +258,7 @@ char notify[maxNotifySign]; //= "Waiting for data - start brewing";
 int sliderval = 0;
 char uhrzeit[6] ="00:00";
 
-SoftwareSerial softSerial(D1, D2);
+//SoftwareSerial softSerial(D6, D7);
 NextionComPort nextion;
 NextionComponent p0kettleButton(nextion, 0, 19);
 NextionComponent p0indButton(nextion, 0, 21);
@@ -304,6 +304,38 @@ NextionComponent p2slider(nextion, 2, 1);
 NextionComponent p2temp_text(nextion, 2, 5);
 NextionComponent p2gauge(nextion, 2, 4);
 
+// Display mit ST77XX Chip
+#include <SPI.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
+#include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
+#include "icons.h" // Icons CraftbeerPi, WLAN, MQTT, and more
+
+#define TFT_CS        D8 //GPIO15  CS
+#define TFT_RST       -1 // RES Or set to -1 and connect to Arduino RESET pin
+#define TFT_DC        D7 //GPIOXX  RS/DC
+#define TFT_MOSI      D6 //GPIOXX  SDA Data out
+#define TFT_SCLK      D5 //GPIO14  SCL Clock out
+
+#define ST77XX_DARKGREY 0x5555
+
+Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
+
+// declare size of working string buffers.
+const size_t    MaxStringGr1               = 24;
+const size_t    MaxStringGr2               = 12;
+const size_t    MaxStringGr3               = 8;
+
+char oldStepname[MaxStringGr2]   = { 0 };
+char oldtimeleft[MaxStringGr2]   = { 0 };
+char oldSTemp[MaxStringGr3]      = { 0 };
+char oldITemp[MaxStringGr3]      = { 0 };
+char oldIndStr[MaxStringGr3]     = { 0 };
+char oldIPStr[MaxStringGr1]      = { 0 };
+char oldKettleName[MaxStringGr2] = { 0 };
+long counter = 0;
+int dispIdx = 0;
+
 
 // Portexpander i2c
 #include "PCF8575.h"  // https://www.mischianti.org/2020/03/13/pcf8574-i2c-digital-i-o-expander-rotary-encoder-part-2/
@@ -341,4 +373,8 @@ void configModeCallback(WiFiManager *myWiFiManager)
     Serial.println(WiFi.softAPIP());
     Serial.print("*** SYSINFO: Start configuration portal ");
     Serial.println(myWiFiManager->getConfigPortalSSID());
+    if(useDisplay) {
+      dispStartScreen();
+      printtext(5, 17, ST77XX_WHITE, ST77XX_BLACK, 1, String(myWiFiManager->getConfigPortalSSID()));
+    }
 }

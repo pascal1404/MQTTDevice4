@@ -76,13 +76,14 @@ void mqttcallback(char *topic, unsigned char *payload, unsigned int length)
 {
   /*
   DEBUG_MSG("Web: Received MQTT Topic with char payload: %s\n", topic);
+  Serial.println(topic);
   Serial.print("Web: Payload: ");
   for (int i = 0; i < length; i++)
   {
     Serial.print((char)payload[i]);
   }
-  Serial.println(" ");
-  */
+  Serial.println(" ");*/
+  
 
   char payload_msg[length];
   for (int i = 0; i < length; i++)

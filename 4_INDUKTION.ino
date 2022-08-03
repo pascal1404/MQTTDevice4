@@ -48,20 +48,41 @@ public:
       // aktuelle PINS deaktivieren
       if (isPin(PIN_WHITE))
       {
-        digitalWrite(PIN_WHITE, HIGH);
+        if (isPortExpanderPin(PIN_WHITE))
+        {
+          pcf8575.digitalWrite(PIN_WHITE - 20, HIGH);
+        }
+        else
+        {
+          digitalWrite(PIN_WHITE, HIGH);
+        }
         pins_used[PIN_WHITE] = false;
       }
 
       if (isPin(PIN_YELLOW))
       {
-        digitalWrite(PIN_YELLOW, HIGH);
+        if (isPortExpanderPin(PIN_YELLOW))
+        {
+          pcf8575.digitalWrite(PIN_YELLOW - 20, HIGH);
+        }
+        else
+        {
+          digitalWrite(PIN_YELLOW, HIGH);
+        }
         pins_used[PIN_YELLOW] = false;
       }
 
       if (isPin(PIN_INTERRUPT))
       {
         detachInterrupt(PIN_INTERRUPT);
-        pinMode(PIN_INTERRUPT, OUTPUT);
+        if (isPortExpanderPin(PIN_INTERRUPT))
+        {
+          pcf8575.pinMode(PIN_INTERRUPT - 20, OUTPUT);
+        }
+        else
+        {
+          pinMode(PIN_INTERRUPT, OUTPUT);
+        }
 
         // digitalWrite(PIN_INTERRUPT, HIGH);
         pins_used[PIN_INTERRUPT] = false;
@@ -88,15 +109,31 @@ public:
       // neue PINS aktiveren
       if (isPin(PIN_WHITE))
       {
-        pinMode(PIN_WHITE, OUTPUT);
-        digitalWrite(PIN_WHITE, LOW);
+        if (isPortExpanderPin(PIN_WHITE))
+        {
+          pcf8575.pinMode(PIN_WHITE - 20, OUTPUT);
+          pcf8575.digitalWrite(PIN_WHITE - 20, LOW);
+        }
+        else
+        {
+          pinMode(PIN_WHITE, OUTPUT);
+          digitalWrite(PIN_WHITE, LOW);
+        }
         pins_used[PIN_WHITE] = true;
       }
 
       if (isPin(PIN_YELLOW))
       {
-        pinMode(PIN_YELLOW, OUTPUT);
-        digitalWrite(PIN_YELLOW, LOW);
+        if (isPortExpanderPin(PIN_YELLOW))
+        {
+          pcf8575.pinMode(PIN_YELLOW - 20, OUTPUT);
+          pcf8575.digitalWrite(PIN_YELLOW - 20, LOW);
+        }
+        else
+        {
+          pinMode(PIN_YELLOW, OUTPUT);
+          digitalWrite(PIN_YELLOW, LOW);
+        }
         pins_used[PIN_YELLOW] = true;
       }
 
@@ -213,7 +250,14 @@ public:
   {
     if (isInduon == true && isRelayon == false)
     { /* Relais einschalten */
-      digitalWrite(PIN_WHITE, HIGH);
+        if (isPortExpanderPin(PIN_WHITE))
+        {
+          pcf8575.digitalWrite(PIN_WHITE - 20, HIGH);
+        }
+        else
+        {
+          digitalWrite(PIN_WHITE, HIGH);
+        }
       return true;
     }
 
@@ -221,7 +265,14 @@ public:
     { /* Relais ausschalten */
       if (millis() > timeTurnedoff + delayAfteroff)
       {
-        digitalWrite(PIN_WHITE, LOW);
+        if (isPortExpanderPin(PIN_WHITE))
+        {
+          pcf8575.digitalWrite(PIN_WHITE - 20, LOW);
+        }
+        else
+        {
+          digitalWrite(PIN_WHITE, LOW);
+        }
         return false;
       }
     }
@@ -319,23 +370,59 @@ public:
 
   void sendCommand(int command[33])
   {
-    digitalWrite(PIN_YELLOW, HIGH);
+    if (isPortExpanderPin(PIN_YELLOW))
+    {
+      pcf8575.digitalWrite(PIN_YELLOW - 20, HIGH);
+    }
+    else
+    {
+      digitalWrite(PIN_YELLOW, HIGH);
+    }
     millis2wait(SIGNAL_START);
-    digitalWrite(PIN_YELLOW, LOW);
+    if (isPortExpanderPin(PIN_YELLOW))
+    {
+      pcf8575.digitalWrite(PIN_YELLOW - 20, LOW);
+    }
+    else
+    {
+      digitalWrite(PIN_YELLOW, LOW);
+    }
     millis2wait(SIGNAL_WAIT);
     for (int i = 0; i < 33; i++)
     {
-      digitalWrite(PIN_YELLOW, HIGH);
+      if (isPortExpanderPin(PIN_YELLOW))
+      {
+        pcf8575.digitalWrite(PIN_YELLOW - 20, HIGH);
+      }
+      else
+      {
+        digitalWrite(PIN_YELLOW, HIGH);
+      }
       delayMicroseconds(command[i]);
-      digitalWrite(PIN_YELLOW, LOW);
+      if (isPortExpanderPin(PIN_YELLOW))
+      {
+        pcf8575.digitalWrite(PIN_YELLOW - 20, LOW);
+      }
+      else
+      {
+        digitalWrite(PIN_YELLOW, LOW);
+      }
       delayMicroseconds(SIGNAL_LOW);
     }
   }
 
   void readInput()
   {
+    bool ishigh = false;
     // Variablen sichern
-    bool ishigh = digitalRead(PIN_INTERRUPT);
+    if (isPortExpanderPin(PIN_INTERRUPT))
+    {
+      ishigh = pcf8575.digitalRead(PIN_INTERRUPT - 20);
+    }
+    else
+    {
+      ishigh = digitalRead(PIN_INTERRUPT);
+    }
     unsigned long newInterrupt = micros();
     long signalTime = newInterrupt - lastInterrupt;
 
